@@ -21,35 +21,51 @@ public class Run {
 	public static void main(String[] args)
 	{		
 		System.out.println("hello");
-//		JTextArea board = display.Launch.launch();
-//		List<List<Character>> map = getMap();
-//		Player player = new Player();
-//		initialSetup(map, board, player);
-//		double time_passed = 0;
-//		double delta_time = 0;
-//		int i = 0;
+		JTextArea board = display.Launch.launch();
+		List<List<Character>> map = getMap();
+		Player player = new Player();
+		initialSetup(map, board, player);
+		double time_passed = 0;
+		double delta_time = 0;
+		long startLoopTime = Calendar.getInstance().getTimeInMillis();
+		long updateLoopTime = Calendar.getInstance().getTimeInMillis();
+		boolean firstLoop = true;
+		
+		while (true) { // keep running
+	    	startLoopTime = Calendar.getInstance().getTimeInMillis();
+	        long tickCheck = startLoopTime - updateLoopTime;
+	        if(firstLoop || tickCheck > 10000 )
+	        {
+	        	firstLoop = false;
+	        	listener(board, player, map);
+	        	updateLoopTime = Calendar.getInstance().getTimeInMillis();
+	        }
+	        //board.setText("nstartLoopTime: "+startLoopTime+"\nupdateLoopTime: "+updateLoopTime+"\ndeltaTime: "+tickCheck);       
+	    }
+		
+		
+//kinda works...		
+//		
+////		for(int i = 0; i < 2; i++)
+//		//{
 //			while (true) { // keep running
-//		    	long startLoopTime = Calendar.getInstance().getTimeInMillis(); 
-//		   
+//		    	long startLoopTime = Calendar.getInstance().getTimeInMillis();
 //		        // update game logic once for every tick passed
-//		  
-//		        while (time_passed >= .01) {
-//		        	
-//		            listener(board, player, map , i);
-//		            time_passed -= .01;
+//		    	boolean playerHasntMoved = true;
+//		        while (time_passed >= 100) {
+//		        	listener(board, player, map);
+//		            time_passed -= 100;
 //		            // You might limit the number of iterations here (like 10)
-//		            // to not get stuck due to processing taking too long (and time adding up)
+//		            // to not get stuck due to processing taking dtoo long (and time adding up)
 //		        }
-//
+//		        //String mapString = convertMapToString(map);
+//		        //board.setText("test");
 //		        // draw screen content
-//		        //drawStuff(delta_time);
-//
 //		        // update timing
 //		    	long endLoopTime = Calendar.getInstance().getTimeInMillis(); 
-//		        delta_time = startLoopTime - endLoopTime;
+//		        delta_time = endLoopTime - startLoopTime;
 //		        time_passed += delta_time;
-//		        i++;
-//		       
+//		        board.setText("in while true \nstartLoopTime: "+startLoopTime+"\nendLoopTime: "+endLoopTime+"\ndeltaTime: "+delta_time+"\ntimePassed: "+time_passed);       
 //		    }
 	}
 	
@@ -65,47 +81,46 @@ public class Run {
 		String mapString = convertMapToString(map);
 		
 		board.setText(mapString);
-		
 	}
 	
 	
-	public static void listener (JTextArea board, Player player, List<List<Character>> map, int i)
+	public static void listener (JTextArea board, Player player, List<List<Character>> map)
 	{
 		
 		
-		board.setText(""+i);
-//		board.addKeyListener(new KeyListener(){
-//		    @Override
-//		    public void keyPressed(KeyEvent e){
-//		        switch (e.getKeyCode()){
-//		        
-//		        case KeyEvent.VK_W:
-//		        	board.setText("YOU PRESSED W");
-//		        	break;
-//		        case KeyEvent.VK_S:
-//		        	board.setText("YOU PRESSED S");
-//		        	break;
-//		        case KeyEvent.VK_A:
-//		        	board.setText("YOU PRESSED A");
-//		        	break;
-//		        case KeyEvent.VK_D:
-//		        	List<List<Character>> reMap = moveToRight(map, player);
-//		        	String reMapString = convertMapToString(reMap);
-//		        	board.setText(reMapString);
-//		        	//text.setText(convertMapToString(map));
-//		        	break;
-//		        case KeyEvent.VK_I:
-//		        	board.setText("YOU PRESSED I");
-//		        	break;
-//		        }
-//		    }
-//		    @Override
-//		    public void keyTyped(KeyEvent e) {
-//		    }
-//		    @Override
-//		    public void keyReleased(KeyEvent e) {
-//		    }
-//		});
+		//board.setText("in listener");
+		board.addKeyListener(new KeyListener(){
+		    @Override
+		    public void keyPressed(KeyEvent e){
+		    	switch (e.getKeyCode()){
+		        
+		        case KeyEvent.VK_W:
+		        	board.setText("YOU PRESSED W");
+		        	return;
+		        case KeyEvent.VK_S:
+		        	board.setText("YOU PRESSED S");
+		        	return;
+		        case KeyEvent.VK_A:
+		        	board.setText("YOU PRESSED A");
+		        	return;
+		        case KeyEvent.VK_D:
+	        		List<List<Character>> reMap = moveMapToRight(map, player);
+		        	String reMapString = convertMapToString(reMap);
+		        	board.setText(reMapString);
+		        	//board.setText(""+player.getPlayerXCoord());
+		        	return;
+		        case KeyEvent.VK_I:
+		        	board.setText("YOU PRESSED I");
+		        	return;
+		        }
+		    }
+		    @Override
+		    public void keyTyped(KeyEvent e) {
+		    }
+		    @Override
+		    public void keyReleased(KeyEvent e) {
+		    }
+		});
 	}
 	
 	
@@ -152,7 +167,7 @@ public class Run {
 		return mapString;
 	}
 	
-	public static List<List<Character>> moveToRight(List<List<Character>> map, Player player)
+	public static List<List<Character>> moveMapToRight(List<List<Character>> map, Player player)
 	{
 		
 		if(map.get(player.getPlayerYCoord()).size() -1 == player.getPlayerXCoord())
@@ -160,11 +175,24 @@ public class Run {
 		
 		Character tempChar = player.getReplacedChar();
 		player.setReplacedChar(map.get(player.getPlayerYCoord()).get(player.getPlayerXCoord()+1));
+		map.get(player.getPlayerYCoord()).set(player.getPlayerXCoord(), tempChar);
 		map.get(player.getPlayerYCoord()).set(player.getPlayerXCoord()+1, player.gerPlayerIcon());
+		player.setPlayerXCoord(player.getPlayerXCoord()+1);
 		
 		return map;
 	}
-
+	public static Player movePlayerToRight(List<List<Character>> map, Player player)
+	{
+		
+		if(map.get(player.getPlayerYCoord()).size() -1 == player.getPlayerXCoord())
+			return player;
+		
+		Character tempChar = player.getReplacedChar();
+		player.setReplacedChar(map.get(player.getPlayerYCoord()).get(player.getPlayerXCoord()+1));
+		player.setPlayerXCoord(player.getPlayerXCoord()+1);
+		
+		return player;
+	}
 	
 	
 	
