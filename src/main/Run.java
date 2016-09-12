@@ -175,7 +175,7 @@ public class Run {
 	public static Map moveMapToRight(Map map, Player player)
 	{
 		
-		if(map.getCharacterList().get(player.getPlayerYCoord()).size() -1 == player.getPlayerXCoord())
+		if(map.getCharacterList().get(player.getPlayerYCoord()).size() -1 == player.getPlayerXCoord() || map.getHitBoxCharacterList().contains(""+map.getCharacterList().get(player.getPlayerYCoord()).get(player.getPlayerXCoord()+1)))
 			return map;
 		
 		Character tempChar = player.getReplacedChar();
@@ -190,7 +190,7 @@ public class Run {
 	public static Map moveMapToLeft(Map map, Player player)
 	{
 		
-		if(0 == player.getPlayerXCoord())
+		if(0 == player.getPlayerXCoord() || map.getHitBoxCharacterList().contains(""+map.getCharacterList().get(player.getPlayerYCoord()).get(player.getPlayerXCoord()-1)))
 			return map;
 		
 		Character tempChar = player.getReplacedChar();
@@ -205,7 +205,7 @@ public class Run {
 	public static Map moveMapDown(Map map, Player player)
 	{
 		
-		if(map.getCharacterList().get(player.getPlayerYCoord()).size() -1 == player.getPlayerYCoord())
+		if(map.getCharacterList().get(player.getPlayerYCoord()).size() -1 == player.getPlayerYCoord() || map.getHitBoxCharacterList().contains(""+map.getCharacterList().get(player.getPlayerYCoord()+1).get(player.getPlayerXCoord())))
 			return map;
 		
 		Character tempChar = player.getReplacedChar();
@@ -220,7 +220,7 @@ public class Run {
 	public static Map moveMapUp(Map map, Player player)
 	{
 		
-		if(0 == player.getPlayerYCoord())
+		if(0 == player.getPlayerYCoord()|| map.getHitBoxCharacterList().contains(""+map.getCharacterList().get(player.getPlayerYCoord()-1).get(player.getPlayerXCoord())))
 			return map;
 		
 		Character tempChar = player.getReplacedChar();
