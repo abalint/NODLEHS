@@ -6,7 +6,7 @@ public class Map {
 
 	List<List<Character>> characterList;
 	String mapString;
-	String hitBoxCharacterList = "#\\/.|";
+	String hitBoxCharacterList = "#\\/.|-";
 	
 	public List<List<Character>> getCharacterList(){return this.characterList;}
 	public String getMapString(){return this.mapString;}
