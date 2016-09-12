@@ -14,6 +14,7 @@ import java.util.Scanner;
 
 import javax.swing.JTextArea;
 
+import item.Item;
 import map.Map;
 import player.Player;
 
@@ -76,6 +77,13 @@ public class Run {
 			
 		player.setPlayerXCoord(3);
 		player.setPlayerYCoord(3);
+		Item log = new Item();
+		log.setName("Log");
+		log.setDescription("Its a log.");
+		log.setPicture("  _\n / /\n/ /");
+		List<Item> playerItemList = new ArrayList<Item>();
+		playerItemList.add(log);
+		player.setItemList(playerItemList);
 
 		player.setReplacedChar(map.getCharacterList().get(player.getPlayerYCoord()).get(player.getPlayerXCoord()));
 		map.getCharacterList().get(player.getPlayerYCoord()).set(player.getPlayerXCoord(), player.gerPlayerIcon());
@@ -93,26 +101,57 @@ public class Run {
 		board.addKeyListener(new KeyListener(){
 		    @Override
 		    public void keyPressed(KeyEvent e){
+		    	Map reMap = new Map();
 		    	switch (e.getKeyCode()){
-		        
 		        case KeyEvent.VK_W:
-		        	Map reMap = moveMapUp(map, player);
+		        	if(player.getInInventory())
+		        	{
+		        		//do some stuff
+		        	}
+		        	else{
+		        	reMap = moveMapUp(map, player);
 		        	board.setText(map.getMapString());
+		        	}
 		        	return;
 		        case KeyEvent.VK_S:
+		        	if(player.getInInventory())
+		        	{
+		        		//do some stuff
+		        	}
+		        	else{
 		        	reMap = moveMapDown(map, player);
 		        	board.setText(map.getMapString());
+		        	}
 		        	return;
 		        case KeyEvent.VK_A:
+		        	if(player.getInInventory())
+		        	{
+		        		//do some stuff
+		        	}
+		        	else{
 		        	reMap = moveMapToLeft(map, player);
 		        	board.setText(map.getMapString());
+		        	}
 		        	return;
 		        case KeyEvent.VK_D:
+		        	if(player.getInInventory())
+		        	{
+		        		//do some stuff
+		        	}
+		        	else{
 		        	reMap = moveMapToRight(map, player);
 		        	board.setText(map.getMapString());
+		        	}
 		        	return;
 		        case KeyEvent.VK_I:
-		        	board.setText("YOU PRESSED I");
+		        	if(!player.getInInventory()){
+		        		board.setText(inventoryString(player));
+		        		player.setInInventory(true);
+		        	}
+		        	else{
+		        		board.setText(map.getMapString());
+		        		player.setInInventory(false);
+		        	}
 		        	return;
 		        }
 		    }
@@ -174,7 +213,6 @@ public class Run {
 	
 	public static Map moveMapToRight(Map map, Player player)
 	{
-		
 		if(map.getCharacterList().get(player.getPlayerYCoord()).size() -1 == player.getPlayerXCoord() || map.getHitBoxCharacterList().contains(""+map.getCharacterList().get(player.getPlayerYCoord()).get(player.getPlayerXCoord()+1)))
 			return map;
 		
@@ -189,7 +227,6 @@ public class Run {
 	
 	public static Map moveMapToLeft(Map map, Player player)
 	{
-		
 		if(0 == player.getPlayerXCoord() || map.getHitBoxCharacterList().contains(""+map.getCharacterList().get(player.getPlayerYCoord()).get(player.getPlayerXCoord()-1)))
 			return map;
 		
@@ -204,7 +241,6 @@ public class Run {
 	
 	public static Map moveMapDown(Map map, Player player)
 	{
-		
 		if(map.getCharacterList().get(player.getPlayerYCoord()).size() -1 == player.getPlayerYCoord() || map.getHitBoxCharacterList().contains(""+map.getCharacterList().get(player.getPlayerYCoord()+1).get(player.getPlayerXCoord())))
 			return map;
 		
@@ -219,7 +255,6 @@ public class Run {
 	
 	public static Map moveMapUp(Map map, Player player)
 	{
-		
 		if(0 == player.getPlayerYCoord()|| map.getHitBoxCharacterList().contains(""+map.getCharacterList().get(player.getPlayerYCoord()-1).get(player.getPlayerXCoord())))
 			return map;
 		
@@ -230,6 +265,17 @@ public class Run {
 		player.setPlayerYCoord(player.getPlayerYCoord()-1);
 		map.setMapString(convertMapToString(map.getCharacterList()));
 		return map;
+	}
+	
+	public static String inventoryString(Player player)
+	{
+		String inventoryString = "INVENTORY: \n";
+		for(Item item : player.getItemList())
+		{
+			inventoryString += item.getName()+"\n"+item.getPicture()+"\n"+item.getDescription()+"\n\n";
+		}
+		
+		return inventoryString;
 	}
 	
 }

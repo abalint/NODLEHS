@@ -10,6 +10,7 @@ public class Player {
 	int playerXcoord;
 	int playerYcoord;
 	List<Item> itemList;
+	boolean inInventory;
 	
 	
 	public void setPlayerIcon(Character playerIconIn){this.playerIcon = playerIconIn ;}
@@ -17,12 +18,14 @@ public class Player {
 	public void setPlayerXCoord(int playerXcoordIn){this.playerXcoord = playerXcoordIn;}
 	public void setPlayerYCoord(int playerYcoordIn){this.playerYcoord = playerYcoordIn;}
 	public void setItemList(List<Item> itemListIn){this.itemList = itemListIn;}
+	public void setInInventory(boolean inInventoryIn){this.inInventory = inInventoryIn;}
 	
 	public Character gerPlayerIcon(){return this.playerIcon;}
 	public Character getReplacedChar(){return this.replacedChar;}
 	public int getPlayerXCoord(){return this.playerXcoord;}
 	public int getPlayerYCoord(){return this.playerYcoord;}
 	public List<Item> getItemList(){return this.itemList;}
+	public boolean getInInventory(){return this.inInventory;}
 	
 	public void addItemToItemList(Item itemIn){this.itemList.add(itemIn);}
 	
