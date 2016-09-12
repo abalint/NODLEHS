@@ -14,6 +14,7 @@ import java.util.Scanner;
 
 import javax.swing.JTextArea;
 
+import map.Map;
 import player.Player;
 
 public class Run {
@@ -22,7 +23,7 @@ public class Run {
 	{		
 		System.out.println("hello");
 		JTextArea board = display.Launch.launch();
-		List<List<Character>> map = getMap();
+		Map map = getMap();
 		Player player = new Player();
 		initialSetup(map, board, player);
 		double time_passed = 0;
@@ -34,7 +35,7 @@ public class Run {
 		while (true) { // keep running
 	    	startLoopTime = Calendar.getInstance().getTimeInMillis();
 	        long tickCheck = startLoopTime - updateLoopTime;
-	        if(firstLoop || tickCheck > 10000 )
+	        if(firstLoop || tickCheck > 1000000 )
 	        {
 	        	firstLoop = false;
 	        	listener(board, player, map);
@@ -70,21 +71,21 @@ public class Run {
 	}
 	
 	
-	public static void initialSetup(List<List<Character>> map,JTextArea board,Player player)
+	public static void initialSetup(Map map,JTextArea board,Player player)
 	{
 			
 		player.setPlayerXCoord(3);
 		player.setPlayerYCoord(3);
 
-		player.setReplacedChar(map.get(player.getPlayerYCoord()).get(player.getPlayerXCoord()));
-		map.get(player.getPlayerYCoord()).set(player.getPlayerXCoord(), player.gerPlayerIcon());
-		String mapString = convertMapToString(map);
+		player.setReplacedChar(map.getCharacterList().get(player.getPlayerYCoord()).get(player.getPlayerXCoord()));
+		map.getCharacterList().get(player.getPlayerYCoord()).set(player.getPlayerXCoord(), player.gerPlayerIcon());
+		map.setMapString(convertMapToString(map.getCharacterList()));
 		
-		board.setText(mapString);
+		board.setText(map.getMapString());
 	}
 	
 	
-	public static void listener (JTextArea board, Player player, List<List<Character>> map)
+	public static void listener (JTextArea board, Player player, Map map)
 	{
 		
 		
@@ -95,19 +96,20 @@ public class Run {
 		    	switch (e.getKeyCode()){
 		        
 		        case KeyEvent.VK_W:
-		        	board.setText("YOU PRESSED W");
+		        	Map reMap = moveMapUp(map, player);
+		        	board.setText(map.getMapString());
 		        	return;
 		        case KeyEvent.VK_S:
-		        	board.setText("YOU PRESSED S");
+		        	reMap = moveMapDown(map, player);
+		        	board.setText(map.getMapString());
 		        	return;
 		        case KeyEvent.VK_A:
-		        	board.setText("YOU PRESSED A");
+		        	reMap = moveMapToLeft(map, player);
+		        	board.setText(map.getMapString());
 		        	return;
 		        case KeyEvent.VK_D:
-	        		List<List<Character>> reMap = moveMapToRight(map, player);
-		        	String reMapString = convertMapToString(reMap);
-		        	board.setText(reMapString);
-		        	//board.setText(""+player.getPlayerXCoord());
+		        	reMap = moveMapToRight(map, player);
+		        	board.setText(map.getMapString());
 		        	return;
 		        case KeyEvent.VK_I:
 		        	board.setText("YOU PRESSED I");
@@ -124,9 +126,9 @@ public class Run {
 	}
 	
 	
-	public static List<List<Character>> getMap()
+	public static Map getMap()
 	{
-		List<List<Character>> map = new ArrayList<List<Character>>();
+		List<List<Character>> mapCharacterList = new ArrayList<List<Character>>();
 		
 		Scanner scanner = null;
 		try {
@@ -144,9 +146,12 @@ public class Run {
 			{
 				mapLine.add(line.charAt(i));
 			}
-			map.add(mapLine);
+			mapCharacterList.add(mapLine);
 		}
 		
+		Map map = new Map();
+		map.setCharacterList(mapCharacterList);
+		map.setMapString(convertMapToString(mapCharacterList));
 		return map;
 	}//end getMap
 	
@@ -167,33 +172,64 @@ public class Run {
 		return mapString;
 	}
 	
-	public static List<List<Character>> moveMapToRight(List<List<Character>> map, Player player)
+	public static Map moveMapToRight(Map map, Player player)
 	{
 		
-		if(map.get(player.getPlayerYCoord()).size() -1 == player.getPlayerXCoord())
+		if(map.getCharacterList().get(player.getPlayerYCoord()).size() -1 == player.getPlayerXCoord())
 			return map;
 		
 		Character tempChar = player.getReplacedChar();
-		player.setReplacedChar(map.get(player.getPlayerYCoord()).get(player.getPlayerXCoord()+1));
-		map.get(player.getPlayerYCoord()).set(player.getPlayerXCoord(), tempChar);
-		map.get(player.getPlayerYCoord()).set(player.getPlayerXCoord()+1, player.gerPlayerIcon());
+		player.setReplacedChar(map.getCharacterList().get(player.getPlayerYCoord()).get(player.getPlayerXCoord()+1));
+		map.getCharacterList().get(player.getPlayerYCoord()).set(player.getPlayerXCoord(), tempChar);
+		map.getCharacterList().get(player.getPlayerYCoord()).set(player.getPlayerXCoord()+1, player.gerPlayerIcon());
 		player.setPlayerXCoord(player.getPlayerXCoord()+1);
-		
+		map.setMapString(convertMapToString(map.getCharacterList()));
 		return map;
 	}
-	public static Player movePlayerToRight(List<List<Character>> map, Player player)
+	
+	public static Map moveMapToLeft(Map map, Player player)
 	{
 		
-		if(map.get(player.getPlayerYCoord()).size() -1 == player.getPlayerXCoord())
-			return player;
+		if(0 == player.getPlayerXCoord())
+			return map;
 		
 		Character tempChar = player.getReplacedChar();
-		player.setReplacedChar(map.get(player.getPlayerYCoord()).get(player.getPlayerXCoord()+1));
-		player.setPlayerXCoord(player.getPlayerXCoord()+1);
-		
-		return player;
+		player.setReplacedChar(map.getCharacterList().get(player.getPlayerYCoord()).get(player.getPlayerXCoord()-1));
+		map.getCharacterList().get(player.getPlayerYCoord()).set(player.getPlayerXCoord(), tempChar);
+		map.getCharacterList().get(player.getPlayerYCoord()).set(player.getPlayerXCoord()-1, player.gerPlayerIcon());
+		player.setPlayerXCoord(player.getPlayerXCoord()-1);
+		map.setMapString(convertMapToString(map.getCharacterList()));
+		return map;
 	}
 	
+	public static Map moveMapDown(Map map, Player player)
+	{
+		
+		if(map.getCharacterList().get(player.getPlayerYCoord()).size() -1 == player.getPlayerYCoord())
+			return map;
+		
+		Character tempChar = player.getReplacedChar();
+		player.setReplacedChar(map.getCharacterList().get(player.getPlayerYCoord()+1).get(player.getPlayerXCoord()));
+		map.getCharacterList().get(player.getPlayerYCoord()).set(player.getPlayerXCoord(), tempChar);
+		map.getCharacterList().get(player.getPlayerYCoord()+1).set(player.getPlayerXCoord(), player.gerPlayerIcon());
+		player.setPlayerYCoord(player.getPlayerYCoord()+1);
+		map.setMapString(convertMapToString(map.getCharacterList()));
+		return map;
+	}
 	
+	public static Map moveMapUp(Map map, Player player)
+	{
+		
+		if(0 == player.getPlayerYCoord())
+			return map;
+		
+		Character tempChar = player.getReplacedChar();
+		player.setReplacedChar(map.getCharacterList().get(player.getPlayerYCoord()-1).get(player.getPlayerXCoord()));
+		map.getCharacterList().get(player.getPlayerYCoord()).set(player.getPlayerXCoord(), tempChar);
+		map.getCharacterList().get(player.getPlayerYCoord()-1).set(player.getPlayerXCoord(), player.gerPlayerIcon());
+		player.setPlayerYCoord(player.getPlayerYCoord()-1);
+		map.setMapString(convertMapToString(map.getCharacterList()));
+		return map;
+	}
 	
 }
