@@ -30,23 +30,63 @@ public class Run {
 		Map map = new Map();
 		Player player = new Player();
 		initialSetup(map, board, player);
-		double time_passed = 0;
-		double delta_time = 0;
+//		
+//		
+//		long lastTime = System.nanoTime();
+//		double amountOfTicks = 0.5;
+//		double ns = 1000000000 / amountOfTicks;
+//		double delta = 0;
+//		long timer = System.currentTimeMillis();
+//		int updates = 0;
+//		int frames = 0;
+//		boolean running = true;
+//		while(running){
+//			long now = System.nanoTime();
+//			delta += (now - lastTime) / ns;
+//			lastTime = now;
+//			while(delta >= 1){
+//				//tick();
+//				listener(board, player, map);
+//				updates++;
+//				delta--;
+//			}
+//			//render();
+//			frames++;
+//					
+//			if(System.currentTimeMillis() - timer > 1000){
+//				timer += 1000;
+//				System.out.println("FPS: " + frames + " TICKS: " + updates);
+//				frames = 0;
+//				updates = 0;
+//			}
+//		}
+//	
+		
+		
+		
+		
 		long startLoopTime = Calendar.getInstance().getTimeInMillis();
 		long updateLoopTime = Calendar.getInstance().getTimeInMillis();
 		boolean firstLoop = true;
-		
+		listener(board, player, map);
 		while (true) { // keep running
 	    	startLoopTime = Calendar.getInstance().getTimeInMillis();
 	        long tickCheck = startLoopTime - updateLoopTime;
-	        if(firstLoop || tickCheck > 1000000 )
+	        if(firstLoop || tickCheck > 10)
 	        {
+	        	//board.setText(""+tickCheck);
+	        	
 	        	firstLoop = false;
-	        	listener(board, player, map);
+	        	
 	        	updateLoopTime = Calendar.getInstance().getTimeInMillis();
+	        	
 	        }
+	        
 	        //board.setText("nstartLoopTime: "+startLoopTime+"\nupdateLoopTime: "+updateLoopTime+"\ndeltaTime: "+tickCheck);       
 	    }
+		
+		//==============================
+		
 		
 		
 //kinda works...		
@@ -118,8 +158,6 @@ public class Run {
 	public static void listener (JTextArea board, Player player, Map map)
 	{
 		
-		
-		//board.setText("in listener");
 		board.addKeyListener(new KeyListener(){
 		    @Override
 		    public void keyPressed(KeyEvent e){
@@ -165,7 +203,7 @@ public class Run {
 		        	board.setText(map.getMapString());
 		        	}
 		        	return;
-		        case KeyEvent.VK_I:
+		        case KeyEvent.VK_I:        	
 		        	if(!player.getInInventory()){
 		        		board.setText(inventoryString(player));
 		        		player.setInInventory(true);
@@ -195,40 +233,7 @@ public class Run {
 		});
 	}
 	
-	
-//	public Map getMap()
-//	{
-//		List<List<Character>> mapCharacterList = new ArrayList<List<Character>>();
-//		InputStream in = getClass().getResourceAsStream("Map.txt");
-//		Scanner scanner = new Scanner(in);
-////		try {
-////			
-////			//InputStream in = this.getClass().getResourceAsStream("lol.txt");
-////			//this.getClass().getClassLoader().getResourceAsStream(fileFromJarFile)
-////			//scanner = new Scanner(new InputStream(this.getClass().getClassLoader().getResourceAsStream("./Files/map.txt"))); 
-////			//scanner = new Scanner(new FileReader("C:/Users/andrew.balint.SATS/workspace/NODLEHS/src/Files/map.txt")); 
-////		} catch (FileNotFoundException e) {
-////			e.printStackTrace();
-////			return null;
-////		}
-//		
-//		while(scanner.hasNextLine())
-//		{
-//			List<Character>mapLine = new ArrayList<Character>();
-//			String line = scanner.nextLine();
-//			for(int i = 0; i < line.length(); i ++)
-//			{
-//				mapLine.add(line.charAt(i));
-//			}
-//			mapCharacterList.add(mapLine);
-//		}
-//		
-//		Map map = new Map();
-//		map.setCharacterList(mapCharacterList);
-//		map.setMapString(convertMapToString(mapCharacterList));
-//		return map;
-//	}//end getMap
-	
+		
 	public static String convertMapToString(List<List<Character>> map)
 	{
 		String mapString = new String();
