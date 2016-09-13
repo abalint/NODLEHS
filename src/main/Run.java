@@ -5,6 +5,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,7 +27,7 @@ public class Run {
 	{		
 		System.out.println("hello");
 		JTextArea board = display.Launch.launch();
-		Map map = getMap();
+		Map map = new Map();
 		Player player = new Player();
 		initialSetup(map, board, player);
 		double time_passed = 0;
@@ -194,34 +196,38 @@ public class Run {
 	}
 	
 	
-	public static Map getMap()
-	{
-		List<List<Character>> mapCharacterList = new ArrayList<List<Character>>();
-		
-		Scanner scanner = null;
-		try {
-			scanner = new Scanner(new FileReader("C:/Users/andrew.balint.SATS/workspace/NODLEHS/src/Files/map.txt")); 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
-		
-		while(scanner.hasNextLine())
-		{
-			List<Character>mapLine = new ArrayList<Character>();
-			String line = scanner.nextLine();
-			for(int i = 0; i < line.length(); i ++)
-			{
-				mapLine.add(line.charAt(i));
-			}
-			mapCharacterList.add(mapLine);
-		}
-		
-		Map map = new Map();
-		map.setCharacterList(mapCharacterList);
-		map.setMapString(convertMapToString(mapCharacterList));
-		return map;
-	}//end getMap
+//	public Map getMap()
+//	{
+//		List<List<Character>> mapCharacterList = new ArrayList<List<Character>>();
+//		InputStream in = getClass().getResourceAsStream("Map.txt");
+//		Scanner scanner = new Scanner(in);
+////		try {
+////			
+////			//InputStream in = this.getClass().getResourceAsStream("lol.txt");
+////			//this.getClass().getClassLoader().getResourceAsStream(fileFromJarFile)
+////			//scanner = new Scanner(new InputStream(this.getClass().getClassLoader().getResourceAsStream("./Files/map.txt"))); 
+////			//scanner = new Scanner(new FileReader("C:/Users/andrew.balint.SATS/workspace/NODLEHS/src/Files/map.txt")); 
+////		} catch (FileNotFoundException e) {
+////			e.printStackTrace();
+////			return null;
+////		}
+//		
+//		while(scanner.hasNextLine())
+//		{
+//			List<Character>mapLine = new ArrayList<Character>();
+//			String line = scanner.nextLine();
+//			for(int i = 0; i < line.length(); i ++)
+//			{
+//				mapLine.add(line.charAt(i));
+//			}
+//			mapCharacterList.add(mapLine);
+//		}
+//		
+//		Map map = new Map();
+//		map.setCharacterList(mapCharacterList);
+//		map.setMapString(convertMapToString(mapCharacterList));
+//		return map;
+//	}//end getMap
 	
 	public static String convertMapToString(List<List<Character>> map)
 	{
