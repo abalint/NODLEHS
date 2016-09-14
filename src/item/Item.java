@@ -1,6 +1,5 @@
 package item;
 
-import java.util.List;
 
 public class Item {
 

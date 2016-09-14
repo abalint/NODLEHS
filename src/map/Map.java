@@ -1,6 +1,5 @@
 package map;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -40,7 +39,7 @@ public class Map {
 			}
 			mapCharacterList.add(mapLine);
 		}
-		
+		scanner.close();
 		
 		this.setCharacterList(mapCharacterList);
 		this.setMapString(convertMapToString(mapCharacterList));
