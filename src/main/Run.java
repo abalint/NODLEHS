@@ -300,24 +300,26 @@ public class Run {
 	
 	public static void interact(Map map, Player player, JTextArea console)
 	{
-		try{
+		
+		List<InteractableObject> iObject = new ArrayList();
 		for(InteractableObject object : map.getInteractableObjectList())
 		{
 			if(player.getPlayerXCoord() == object.getXYCoordinateList().get(0) && player.getPlayerYCoord() == object.getXYCoordinateList().get(1))
 			{
-				if(object.getisItem())
-				{
-					player.addItemToItemList(object.getItem());
-					map.getInteractableObjectList().remove(object);
-					player.setReplacedChar(' ');
-					console.append("You have found a "+ object.getName()+"!\n");
-				}
+				iObject.add(object);
 			}
 		}
-		}
-		catch(Exception e)
+		
+		
+		for(InteractableObject object : iObject)
 		{
-			console.append(e.toString()+"\n");;
+			if(object.getisItem())
+			{
+				player.addItemToItemList(object.getItem());
+				map.getInteractableObjectList().remove(object);
+				player.setReplacedChar(' ');
+				console.append("You have found a "+ object.getName()+"!\n");
+			}
 		}
 		
 	}
