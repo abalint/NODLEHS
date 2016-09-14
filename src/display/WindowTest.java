@@ -16,6 +16,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JScrollPane;
+import java.awt.Font;
 
 public class WindowTest extends JFrame {
 
@@ -90,6 +91,7 @@ public class WindowTest extends JFrame {
 		scrollPane_1.setViewportView(console);
 		
 		board = new JTextArea();
+		board.setFont(new Font("Monospaced", Font.PLAIN, 11));
 		board.setEditable(false);
 		scrollPane.setViewportView(board);
 		contentPane.setLayout(gl_contentPane);

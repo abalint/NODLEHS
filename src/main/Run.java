@@ -37,10 +37,9 @@ public class Run {
 		frame = new WindowTest();
 		frame.setVisible(true);
 		
-		frame.setConsole("test");
-		frame.setBoard("test");
 		
 		JTextArea board = frame.getBoard();
+		JTextArea console = frame.getConsole();
 		
 
 		System.out.println("hello");
@@ -63,7 +62,7 @@ public class Run {
 	        {
 	        	//board.setText(""+tickCheck);
 	        	
-	        	executeQueue(map, player, board);
+	        	executeQueue(map, player, board, console);
 	        	firstLoop = false;
 	        	
 	        	updateLoopTime = Calendar.getInstance().getTimeInMillis();
@@ -150,7 +149,7 @@ public class Run {
 	
 		
 	
-	public static void executeQueue(Map map, Player player, JTextArea board)
+	public static void executeQueue(Map map, Player player, JTextArea board, JTextArea console)
 	{
 		for(String input : player.getinputQueue())
 		{
@@ -208,7 +207,7 @@ public class Run {
 	        		//do some stuff
 	        	}
 	        	else
-	        		interact(map, player);
+	        		interact(map, player, console);
 			}
 			
 		}//end for loop
@@ -299,9 +298,9 @@ public class Run {
 		return inventoryString;
 	}
 	
-	public static void interact(Map map, Player player)
+	public static void interact(Map map, Player player, JTextArea console)
 	{
-		
+		try{
 		for(InteractableObject object : map.getInteractableObjectList())
 		{
 			if(player.getPlayerXCoord() == object.getXYCoordinateList().get(0) && player.getPlayerYCoord() == object.getXYCoordinateList().get(1))
@@ -311,8 +310,14 @@ public class Run {
 					player.addItemToItemList(object.getItem());
 					map.getInteractableObjectList().remove(object);
 					player.setReplacedChar(' ');
+					console.append("You have found a "+ object.getName()+"!\n");
 				}
 			}
+		}
+		}
+		catch(Exception e)
+		{
+			console.append(e.toString()+"\n");;
 		}
 		
 	}
