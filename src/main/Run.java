@@ -1,12 +1,16 @@
 package main;
 
 
+import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.swing.JTextArea;
+import javax.swing.UIManager;
+
+import display.WindowTest;
 import item.Item;
 import map.InteractableObject;
 import map.Map;
@@ -23,10 +27,26 @@ public class Run {
 
 	public static void main(String[] args)
 	{		
+		WindowTest frame;
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		
+		frame = new WindowTest();
+		frame.setVisible(true);
+		
+		frame.setConsole("test");
+		frame.setBoard("test");
+		
+		JTextArea board = frame.getBoard();
+		
+
 		System.out.println("hello");
-		JTextArea board = display.Launch.launch();
 		Map map = new Map();
 		Player player = new Player();
+		WindowTest window = new WindowTest();
 		initialSetup(map, board, player);	
 		
 		
