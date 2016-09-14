@@ -23,12 +23,16 @@ public class WindowTest extends JFrame {
 	private JLayeredPane contentPane;
 	JTextArea board;
 	JTextArea console;
+	JTextArea inputTextArea;
+	private JScrollPane inputPane;
 	
 	public JTextArea getBoard(){return this.board;}
 	public JTextArea getConsole(){return this.console;}
+	public JTextArea getInputTextArea(){return this.inputTextArea;}
 	
 	public void setBoard(String boardIn){this.board.setText(boardIn);}
 	public void setConsole(String consoleIn){this.console.setText(consoleIn);}
+	public void setInputTextArea(String inputTextIn){this.console.setText(inputTextIn);}
 
 	/**
 	 * Launch the application.
@@ -69,31 +73,40 @@ public class WindowTest extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		
-		JScrollPane scrollPane = new JScrollPane();
+		JScrollPane boardPane = new JScrollPane();
 		
-		JScrollPane scrollPane_1 = new JScrollPane();
+		JScrollPane consolePane = new JScrollPane();
+		
+		inputPane = new JScrollPane();
 		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 830, Short.MAX_VALUE)
-				.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE)
+				.addComponent(boardPane, GroupLayout.DEFAULT_SIZE, 829, Short.MAX_VALUE)
+				.addComponent(consolePane, GroupLayout.DEFAULT_SIZE, 829, Short.MAX_VALUE)
+				.addComponent(inputPane, GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE)
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)
+					.addComponent(boardPane, GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 151, GroupLayout.PREFERRED_SIZE))
+					.addComponent(consolePane, GroupLayout.PREFERRED_SIZE, 141, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(inputPane, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
+					.addGap(0))
 		);
 		
+		inputTextArea = new JTextArea();
+		inputPane.setViewportView(inputTextArea);
+		
 		console = new JTextArea();
-		scrollPane_1.setViewportView(console);
+		consolePane.setViewportView(console);
 		
 		board = new JTextArea();
 		board.setFont(new Font("Monospaced", Font.PLAIN, 11));
 		board.setEditable(false);
-		scrollPane.setViewportView(board);
+		boardPane.setViewportView(board);
 		contentPane.setLayout(gl_contentPane);
 		
 	}

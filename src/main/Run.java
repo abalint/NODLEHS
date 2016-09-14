@@ -40,7 +40,7 @@ public class Run {
 		
 		JTextArea board = frame.getBoard();
 		JTextArea console = frame.getConsole();
-		
+		JTextArea inputText = frame.getInputTextArea();
 
 		System.out.println("hello");
 		Map map = new Map();
