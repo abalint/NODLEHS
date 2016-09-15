@@ -18,7 +18,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JScrollPane;
 import java.awt.Font;
 
-public class WindowTest extends JFrame {
+public class LaunchWindow extends JFrame {
 
 	private JLayeredPane contentPane;
 	JTextArea board;
@@ -34,31 +34,11 @@ public class WindowTest extends JFrame {
 	public void setConsole(String consoleIn){this.console.setText(consoleIn);}
 	public void setInputTextArea(String inputTextIn){this.console.setText(inputTextIn);}
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					WindowTest frame = new WindowTest();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
 	 */
-	public WindowTest() {
+	public LaunchWindow() {
 		
 		initComponents();
 		createEvents();
@@ -101,6 +81,7 @@ public class WindowTest extends JFrame {
 		inputPane.setViewportView(inputTextArea);
 		
 		console = new JTextArea();
+		console.setEditable(false);
 		consolePane.setViewportView(console);
 		
 		board = new JTextArea();

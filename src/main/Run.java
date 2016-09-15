@@ -7,10 +7,12 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
-import display.WindowTest;
+import display.LaunchWindow;
 import item.Item;
 import map.InteractableObject;
 import map.Map;
@@ -27,44 +29,54 @@ public class Run {
 
 	public static void main(String[] args)
 	{		
-		WindowTest frame;
+		LaunchWindow frame;
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		
-		frame = new WindowTest();
+		frame = new LaunchWindow();
 		frame.setVisible(true);
 		
 		
-		JTextArea board = frame.getBoard();
+		JTextArea board = frame.getBoard();		
 		JTextArea console = frame.getConsole();
-		JTextArea inputText = frame.getInputTextArea();
-
-		System.out.println("hello");
+		JTextArea textBar = frame.getInputTextArea();
 		Map map = new Map();
 		Player player = new Player();
-		WindowTest window = new WindowTest();
 		initialSetup(map, board, player);	
+	
 		
-		
-		
+		long gameLaunchTime = Calendar.getInstance().getTimeInMillis();
 		long startLoopTime = Calendar.getInstance().getTimeInMillis();
 		long updateLoopTime = Calendar.getInstance().getTimeInMillis();
 		boolean firstLoop = true;
-		listener(board, player, map);
+		boardListener(board, player, map);
+		consoleListener(console, player, map);
+		int tickCount = 0;
 		
+		player.addToConsoleOutput("welcome!");
+		console.setText(player.getConvertedConsoleOutputToString());
+
 		while (true) { // keep running
 	    	startLoopTime = Calendar.getInstance().getTimeInMillis();
 	        long tickCheck = startLoopTime - updateLoopTime;
+	        long runTime = startLoopTime - gameLaunchTime;
+	        String runTimeFormated = String.format("%02d:%02d:%02d", 
+	        		TimeUnit.MILLISECONDS.toHours(runTime),
+	        		TimeUnit.MILLISECONDS.toMinutes(runTime) -  
+	        		TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(runTime)), // The change is in this line
+	        		TimeUnit.MILLISECONDS.toSeconds(runTime) - 
+	        		TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(runTime)));
 	        if(firstLoop || tickCheck > 10)
 	        {
-	        	//board.setText(""+tickCheck);
-	        	
-	        	executeQueue(map, player, board, console);
+	        	tickCount++;
+	        	executeBoardQueue(map, player, board, console);
+	        	executeConsoleQueue(map, player, board, console, startLoopTime, updateLoopTime, tickCheck, tickCount, runTimeFormated);
+	        	if(player.getInConsoleInfo())
+	        		getStatsInConsole(console, player, startLoopTime, updateLoopTime, tickCheck, tickCount, runTimeFormated);
 	        	firstLoop = false;
-	        	
 	        	updateLoopTime = Calendar.getInstance().getTimeInMillis();
 	        }
 	    }
@@ -111,7 +123,7 @@ public class Run {
 	}
 	
 	
-	public static void listener (JTextArea board, Player player, Map map)
+	public static void boardListener (JTextArea board, Player player, Map map)
 	{
 		
 		board.addKeyListener(new KeyListener(){
@@ -119,22 +131,22 @@ public class Run {
 		    public void keyPressed(KeyEvent e){
 		    	switch (e.getKeyCode()){
 		        case KeyEvent.VK_W:
-		        	player.appendToInputQueue("W");
+		        	player.appendToBoardInputQueue("W");
 		        	break;
 		        case KeyEvent.VK_S:
-		        	player.appendToInputQueue("S");
+		        	player.appendToBoardInputQueue("S");
 		        	break;
 		        case KeyEvent.VK_A:
-		        	player.appendToInputQueue("A");
+		        	player.appendToBoardInputQueue("A");
 		        	break;
 		        case KeyEvent.VK_D:
-		        	player.appendToInputQueue("D");
+		        	player.appendToBoardInputQueue("D");
 		        	break;
 		        case KeyEvent.VK_I:      
-		        	player.appendToInputQueue("I");
+		        	player.appendToBoardInputQueue("I");
 		        	break;	
 		        case KeyEvent.VK_SPACE:
-		        	player.appendToInputQueue("SPACE");
+		        	player.appendToBoardInputQueue("SPACE");
 		        	break;
 		        }
 		    }
@@ -147,12 +159,33 @@ public class Run {
 		});
 	}
 	
-		
-	
-	public static void executeQueue(Map map, Player player, JTextArea board, JTextArea console)
+	public static void consoleListener (JTextArea console, Player player, Map map)
 	{
-		for(String input : player.getinputQueue())
+		console.addKeyListener(new KeyListener(){
+		    @Override
+		    public void keyPressed(KeyEvent e){
+		    	switch (e.getKeyCode()){
+		        case KeyEvent.VK_I:
+		        	player.appendToConsoleInputQueue("I");
+
+		        }
+		    }
+		    @Override
+		    public void keyTyped(KeyEvent e) {
+		    }
+		    @Override
+		    public void keyReleased(KeyEvent e) {
+		    }
+		});
+	}
+			
+	public static void executeBoardQueue(Map map, Player player, JTextArea board, JTextArea console)
+	{
+		int loopCounter = 0;
+		for(String input : player.getBoardInputQueue())
 		{
+			if(loopCounter == 5)
+				break;
 			if(input == "W")
 			{
 	        	if(player.getInInventory())
@@ -209,10 +242,48 @@ public class Run {
 	        	else
 	        		interact(map, player, console);
 			}
+			loopCounter++;
 			
 		}//end for loop
-		player.clearInputQueue();
+		player.clearBoardInputQueue();
 	}//end executeQueue
+	
+	public static void executeConsoleQueue(Map map, Player player, JTextArea board, JTextArea console, long startLoopTime, long updateLoopTime, long tickCheck, long tickCount, String runTime)
+	{
+		
+		for(String input : player.getConsoleInputQueue())
+		{
+			if(input == "I")
+			{
+	        	if(player.getInConsoleInfo())
+	        	{
+	        		console.setText(player.getConvertedConsoleOutputToString());
+	        		player.setInConsoleInfo(false);
+	        	}
+	        	else
+	        		getStatsInConsole(console, player, startLoopTime, updateLoopTime, tickCheck, tickCount,runTime);
+	        	
+			}//end W case
+		}//end for
+		player.clearConsoleInputQueue();
+	}//end method
+	
+	public static void executeTextBarQueue(Map map, Player player, JTextArea board, JTextArea console)
+	{
+		
+	}
+	
+	public static void getStatsInConsole(JTextArea console, Player player,long startLoopTime, long updateLoopTime, long tickCheck, long tickCount, String runTime)
+	{
+		console.setText("RunTime: "+runTime+
+				"\nTickCount: "+tickCount+
+				"\ntickCheck: "+tickCheck+
+				"\nstartLoopTime: "+startLoopTime+
+				"\nupdateLoopTime: "+updateLoopTime+
+				"\nPlayer Location: ("+player.getPlayerXCoord()+","+player.getPlayerYCoord()+")"+
+				"");
+		player.setInConsoleInfo(true);
+	}
 	
 	public static String convertMapToString(List<List<Character>> map)
 	{
@@ -318,7 +389,8 @@ public class Run {
 				player.addItemToItemList(object.getItem());
 				map.getInteractableObjectList().remove(object);
 				player.setReplacedChar(' ');
-				console.append("You have found a "+ object.getName()+"!\n");
+				player.addToConsoleOutput("You have found a "+ object.getName()+"!\n");
+				console.setText(player.getConvertedConsoleOutputToString());
 			}
 		}
 		
