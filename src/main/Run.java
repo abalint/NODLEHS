@@ -72,7 +72,11 @@ public class Run {
 	        if(firstLoop || tickCheck > 10)
 	        {
 	        	tickCount++;
+	        	try{
 	        	executeBoardQueue(map, player, board, console);
+	        	}catch(Exception e){
+	        		//console.setText(e.toString());
+	        		}
 	        	executeConsoleQueue(map, player, board, console, startLoopTime, updateLoopTime, tickCheck, tickCount, runTimeFormated);
 	        	if(player.getInConsoleInfo())
 	        		getStatsInConsole(console, player, startLoopTime, updateLoopTime, tickCheck, tickCount, runTimeFormated);
