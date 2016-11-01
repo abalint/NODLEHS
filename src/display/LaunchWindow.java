@@ -54,10 +54,13 @@ public class LaunchWindow extends JFrame {
 		setContentPane(contentPane);
 		
 		JScrollPane boardPane = new JScrollPane();
+		boardPane.setAutoscrolls(true);
 		
 		JScrollPane consolePane = new JScrollPane();
+		consolePane.setAutoscrolls(true);
 		
 		inputPane = new JScrollPane();
+		inputPane.setAutoscrolls(true);
 		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
