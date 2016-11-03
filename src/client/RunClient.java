@@ -80,36 +80,36 @@ public class RunClient {
 	        if(firstLoop || tickCheck > 10)
 	        {
 	        	tickCount++;
-	        	
-	        	
-	        
-	        	
-	        	
 	        	//server check
 	        	if(enter.getEntered())
-	        	{
 	        		pressedEnter(textBar, console, enter, out);
-	        	}
 	        	
-	       
 	        	String line = in.readLine();      
-           if (line.startsWith("SUBMITNAME")) {
-               console.append("Submit your name\n");
-               }
-	            else if (line.startsWith("NAMEACCEPTED")) {
-	                 console.append("Name Accepted\n");
-	            }
-	            else if(line.startsWith("INVALIDNAME")){
-	            	console.append("Name alread in use, please select another.\n");
-	            }
-	            else if (line.startsWith("MESSAGE")) {
-	                board.append(line.substring(8) + "\n");
-	            }
-//	            if(enter.getEntered())
-//	            	console.setText("true");
-//	            else
-//	            	console.setText("false");
-	        
+	        	if (line.startsWith("SUBMITNAME")) {
+	        		console.append("Enter your username\n");
+	        	}
+	        	else if(line.startsWith("SUBMITPASS"))
+	        	{
+	        		console.append("Enter password\n");
+	        	}
+		       	else if (line.startsWith("NAMEACCEPTED")) {
+		             console.append("accepted\n");
+		        }
+		        else if(line.startsWith("INVALIDNAME")){
+		        	console.append("User does not exist, would you like to create this character?\n");
+		        }
+		        else if(line.startsWith("SUBMITNEWPASS"))
+		        {
+		        	console.append("Enter password\n");
+		        }
+		        else if (line.startsWith("MESSAGE")) {
+		            board.append(line.substring(8) + "\n");
+		        }
+	//	            if(enter.getEntered())
+	//	            	console.setText("true");
+	//	            else
+	//	            	console.setText("false");
+	    
 	        	
 	        	
 	        	firstLoop = false;
@@ -124,6 +124,7 @@ public class RunClient {
 		//console.setText(console.getText()+""+textBar.getText());
 		textBar.setText("");
 		enter.setEntered(false);
+		
 	}
 	public static void textBarListener (JTextArea textBar, Entered enter, PrintWriter out)
 	{

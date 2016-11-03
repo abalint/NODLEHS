@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
+import java.util.Scanner;
 
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
@@ -83,6 +84,8 @@ public class RunServer {
      */
     private static class Handler extends Thread {
         private String name;
+        private String password;
+        private String lineIn;
         private Socket socket;
         private BufferedReader in;
         private PrintWriter out;
@@ -129,20 +132,33 @@ public class RunServer {
                 // must be done while locking the set of names.
                 while (true) {
                     out.println("SUBMITNAME");
-                    board.append("Asking for name\n");
+                    board.append("Asking for login information\n");
                     name = in.readLine();
                     if (name == null) {
                         return;
                     }
                     synchronized (names) {
-                        if (!names.contains(name)) {
-                            names.add(name);
-                            board.append("Name accpeted, new user: "+name+"\n");
+                        if (checkUser(name)) {
+                            board.append("User exists: "+name+"\n");
+                            out.println("SUBMITPASS");
+                            board.append("requesting password");
+                            password = in.readLine();
+                            if(password == null)
+                            	return;
                             break;
                         }
                         else{
-                        	board.append("Invalid user name, asking again\n");
+                        	board.append("User does not exist, asking if it should be created.\n");
                         	out.println("INVALIDNAME");
+                        	lineIn = in.readLine();
+                        	console.append(lineIn);
+                        	if(lineIn.toUpperCase().equals("YES") || lineIn.toUpperCase().equals("Y"))
+                        	{
+                        		out.println("SUBMITNEWPASS");
+                        		lineIn = in.readLine();
+                        		createAccount(name, lineIn);
+                        	}
+                        	
                         }
                        
                     }
@@ -187,6 +203,25 @@ public class RunServer {
                 } catch (IOException e) {
                 }
             }
+        }
+        
+        public boolean checkUser(String name)
+        {
+        	try{
+        		Scanner scanner = new Scanner(getClass().getResourceAsStream("/Files/"+name+".ini"));
+        	}
+        	catch(Exception e)
+        	{
+        		return false;
+        	}
+        	
+        	return true;
+        }
+        
+        public void createAccount (String name, String pass)
+        {
+        	
+        	return;
         }
     }
 }
