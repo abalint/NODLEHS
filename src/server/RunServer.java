@@ -1,12 +1,17 @@
 package server;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.swing.JTextArea;
@@ -141,11 +146,17 @@ public class RunServer {
                         if (checkUser(name)) {
                             board.append("User exists: "+name+"\n");
                             out.println("SUBMITPASS");
-                            board.append("requesting password");
+                            board.append("requesting password\n");
                             password = in.readLine();
                             if(password == null)
                             	return;
-                            break;
+                            board.append("password entered: "+password+"\n");
+                            if(checkPassword(name, password, board)){
+                            	board.append("password accepted");
+                            	out.println("ACCOUNTACCEPTED");
+                            	break;
+                            }
+                            
                         }
                         else{
                         	board.append("User does not exist, asking if it should be created.\n");
@@ -155,8 +166,21 @@ public class RunServer {
                         	if(lineIn.toUpperCase().equals("YES") || lineIn.toUpperCase().equals("Y"))
                         	{
                         		out.println("SUBMITNEWPASS");
-                        		lineIn = in.readLine();
-                        		createAccount(name, lineIn);
+                        		String pass = in.readLine();
+                        		out.println("VERIFYPASS");
+                        		String pass2 = in.readLine();
+                        		if(pass2.equals(pass)){
+                        			board.append("Passwords match");
+                        			int rValue = createAccount(name, lineIn);
+                        			board.append(rValue+"\n");
+                            			//out.println("ACCOUNTCREATED");
+                  
+                        		}
+                        		else{
+                        			board.append("Password mismatch\n");
+                        			out.println("MISMATCHPASS");
+                        			//break;
+                        		}
                         	}
                         	
                         }
@@ -217,11 +241,81 @@ public class RunServer {
         	
         	return true;
         }
-        
-        public void createAccount (String name, String pass)
+        public boolean checkPassword(String name, String pass, JTextArea board)
         {
+        	board.append("checking password\n");
+        	Scanner scanner = null;
+        	try{
+        		scanner = new Scanner(getClass().getResourceAsStream("/Files/"+name+".ini"));
+        		
+        	}
+        	catch(Exception e)
+        	{
+        		board.append("scanner failed\n");
+        		return false;
+        	}
+        	board.append("scanner passed\n");
         	
-        	return;
+        	Map<String, Map<String, String>> fullMap = createAssociativeArray(scanner);
+        	board.append("printing pass from file\n");
+        	board.append("password from file: "+fullMap.get("account").get("password")+"\n");
+        	board.append("Should have printed\n");
+        	if(fullMap.get("account").get("password").equals(pass))
+        	{
+        		return true;
+        	}
+        	
+        	return false;
+        }
+        
+        public int createAccount (String name, String pass)
+        {
+        	File file = null;
+        	try{
+        		file = new File(("./Files/"+name+".ini"));
+        		file.getParentFile().mkdirs(); 
+        		file.createNewFile();
+        		Scanner scanner = new Scanner(getClass().getResourceAsStream("/Files/"+name+".ini"));
+	        	FileWriter fw = new FileWriter(file.getAbsoluteFile());
+	            BufferedWriter bw = new BufferedWriter(fw);
+	            // write in file
+	            bw.write("[account]\npassword = "+pass+"\n\n[location]\nx = 3\ny = 3\n\n[inventory]\nslot1 = log");
+	            // close connection
+	            bw.close();
+	        }
+	    	catch(Exception e)
+	    	{
+	    		return 2;
+	    	}
+        	return 0;
+        }
+        
+        public Map<String, Map<String, String>> createAssociativeArray(Scanner scanner)
+        {
+        	Map<String, String> attributes = new HashMap<String, String>();
+        	Map<String, Map<String, String>> fullMap = new HashMap<String, Map<String, String>>();
+        	
+        	String title = "";
+        	while(scanner.hasNextLine())
+        	{
+        		String line = scanner.nextLine();
+        		if(line.contains("["))
+        		{
+        			line.substring(1, line.length()-1);
+        			title = line;
+        			
+        		}
+        		else if(line.length()>0)
+        		{
+        			String[] attribute = line.split("=");
+        			attributes.put(attribute[0].trim(), attribute[1].trim());
+        			fullMap.put(title, attributes);
+        			attributes = new HashMap<String, String>();
+        		}
+        	}
+        	
+        	
+        	return fullMap;
         }
     }
 }

@@ -102,6 +102,23 @@ public class RunClient {
 		        {
 		        	console.append("Enter password\n");
 		        }
+		        else if(line.startsWith("VERIFYPASS"))
+		        {
+		        	console.append("Verify password\n");
+		        }
+		        else if(line.startsWith("MISMATCHPASS"))
+		        {
+		        	console.append("Passwords did not match\n");
+		        }
+		        else if(line.startsWith("ACCOUNTCREATED"))
+		        {
+		        	console.append("Account created\n");
+		        }
+		        else if(line.startsWith("ACCOUNTACCEPTED"))
+		        {
+		        	console.append("Logon successful\n");
+		        }
+	        	
 		        else if (line.startsWith("MESSAGE")) {
 		            board.append(line.substring(8) + "\n");
 		        }
