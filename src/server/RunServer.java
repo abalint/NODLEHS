@@ -136,61 +136,14 @@ public class RunServer {
                 // checking for the existence of a name and adding the name
                 // must be done while locking the set of names.
                 while (true) {
-                    out.println("SUBMITNAME");
-                    board.append("Asking for login information\n");
-                    name = in.readLine();
-                    if (name == null) {
-                        return;
-                    }
-                    synchronized (names) {
-                        if (checkUser(name)) {
-                            board.append("User exists: "+name+"\n");
-                            out.println("SUBMITPASS");
-                            board.append("requesting password\n");
-                            password = in.readLine();
-                            if(password == null)
-                            	return;
-                            board.append("password entered: "+password+"\n");
-                            if(checkPassword(name, password, board)){
-                            	board.append("password accepted");
-                            	out.println("ACCOUNTACCEPTED");
-                            	break;
-                            }
-                            
-                        }
-                        else{
-                        	board.append("User does not exist, asking if it should be created.\n");
-                        	out.println("INVALIDNAME");
-                        	lineIn = in.readLine();
-                        	console.append(lineIn);
-                        	if(lineIn.toUpperCase().equals("YES") || lineIn.toUpperCase().equals("Y"))
-                        	{
-                        		out.println("SUBMITNEWPASS");
-                        		String pass = in.readLine();
-                        		out.println("VERIFYPASS");
-                        		String pass2 = in.readLine();
-                        		if(pass2.equals(pass)){
-                        			board.append("Passwords match");
-                        			int rValue = createAccount(name, pass);
-                        			board.append(rValue+"\n");
-                            			//out.println("ACCOUNTCREATED");
-                  
-                        		}
-                        		else{
-                        			board.append("Password mismatch\n");
-                        			out.println("MISMATCHPASS");
-                        			//break;
-                        		}
-                        	}
-                        	
-                        }
-                       
-                    }
+                	runLogin(in, out);
+                	break;
                 }
 
                 // Now that a successful name has been chosen, add the
                 // socket's print writer to the set of all writers so
                 // this client can receive broadcast messages.
+                
                 out.println("NAMEACCEPTED");
                 writers.add(out);
 
@@ -229,6 +182,74 @@ public class RunServer {
             }
         }
         
+        public void runLogin(BufferedReader in, PrintWriter out) throws IOException
+        {
+        	out.println("SUBMITNAME");
+            board.append("Asking for login information\n");
+            name = in.readLine();
+            if (name == null) {
+            	runLogin(in, out);
+            }
+            boolean pwMatch = false;
+            synchronized (names) {
+                if (checkUser(name)) {
+                	for(int i = 0; i < 3; i ++)
+                	{
+	                    board.append("User exists: "+name+"\n");
+	                    out.println("SUBMITPASS");
+	                    board.append("requesting password\n");
+	                    password = in.readLine();
+	                    if(password == null)
+	                    	break;
+	                    board.append("password entered: "+password+"\n");
+	                    if(checkPassword(name, password, board)){
+	                    	board.append("password accepted");
+	                    	out.println("ACCOUNTACCEPTED");
+	                    	return;
+	                    }
+	                    else{
+	                    	board.append("password mismatch");
+	                    	out.println("MESSAGE password mismatch.");
+	                    }
+	                    
+	                }
+                	if(!pwMatch)
+                		runLogin(in,out);
+                }
+                else{
+                	board.append("User does not exist, asking if it should be created.\n");
+                	out.println("INVALIDNAME");
+                	lineIn = in.readLine();
+                	console.append(lineIn);
+                	if(lineIn.toUpperCase().equals("YES") || lineIn.toUpperCase().equals("Y"))
+                	{
+                		pwMatch = false;
+                		for(int i = 0; i < 3; i++){
+	                		out.println("SUBMITNEWPASS");
+	                		String pass = in.readLine();
+	                		out.println("VERIFYPASS");
+	                		String pass2 = in.readLine();
+	                		if(pass2.equals(pass)){
+	                			int rValue = createAccount(name, pass);
+	                			board.append(rValue+"\n");
+	                			pwMatch = true;
+	                    			//out.println("ACCOUNTCREATED");
+	                			return;
+	          
+	                		}
+	                		
+	            
+                		}
+                		if(!pwMatch)
+                			runLogin(in, out);
+                	}
+                	else{
+                		runLogin(in, out);
+                	}
+                }
+            }
+        }
+        
         public boolean checkUser(String name)
         {
         	try{
@@ -245,8 +266,10 @@ public class RunServer {
         {
         	board.append("checking password\n");
         	Scanner scanner = null;
+        	File file = null;
         	try{
-        		scanner = new Scanner(getClass().getResourceAsStream("/Files/"+name+".ini"));
+        		file = new File(("./bin/Files/"+name+".ini"));
+        		scanner = new Scanner(file);
         		
         	}
         	catch(Exception e)
@@ -254,11 +277,21 @@ public class RunServer {
         		board.append("scanner failed\n");
         		return false;
         	}
+        	
         	board.append("scanner passed\n");
         	
-        	Map<String, Map<String, String>> fullMap = createAssociativeArray(scanner);
+        	Map<String, Map<String, String>> fullMap = createAssociativeArray(scanner, board);
         	board.append("printing pass from file\n");
-        	board.append("password from file: "+fullMap.get("account").get("password")+"\n");
+        	try{
+        	String passFromFile = fullMap.get("account").get("password");
+        	board.append(passFromFile);
+        	}
+        	catch(Exception e)
+        	{
+        		board.append("Failed to get password from array \nerror: "+e );
+        	}
+        	
+        	//board.append("password from file: "+fullMap.get("account").get("password")+"\n");
         	board.append("Should have printed\n");
         	if(fullMap.get("account").get("password").equals(pass))
         	{
@@ -275,7 +308,7 @@ public class RunServer {
         		file = new File(("./bin/Files/"+name+".ini"));        		
         		file.getParentFile().mkdirs(); 
         		file.createNewFile();
-        		Scanner scanner = new Scanner(getClass().getResourceAsStream("/Files/"+name+".ini"));
+        		//Scanner scanner = new Scanner(getClass().getResourceAsStream("/Files/"+name+".ini"));
 	        	FileWriter fw = new FileWriter(file.getAbsoluteFile());
 	            BufferedWriter bw = new BufferedWriter(fw);
 	            // write in file
@@ -305,17 +338,25 @@ public class RunServer {
         	return 0;
         }
         
-        public Map<String, Map<String, String>> createAssociativeArray(Scanner scanner)
+        public Map<String, Map<String, String>> createAssociativeArray(Scanner scanner, JTextArea board)
         {
         	Map<String, String> attributes = new HashMap<String, String>();
         	Map<String, Map<String, String>> fullMap = new HashMap<String, Map<String, String>>();
         	
+        	board.append("in create Associative");
+        	
         	String title = "";
+        	int i = 0;
         	while(scanner.hasNextLine())
         	{
+        		board.append("loop #: "+i +"\n");
+        		i++;
         		String line = scanner.nextLine();
+        		board.append("got first line: "+line +"\n");
+            	
         		if(line.contains("["))
         		{
+        			board.append("in contains [\n");
         			line.substring(1, line.length()-1);
         			title = line;
         			
@@ -329,6 +370,7 @@ public class RunServer {
         		}
         	}
         	
+        	board.append("exiting create Associative\n");
         	
         	return fullMap;
         }
