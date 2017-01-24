@@ -171,7 +171,7 @@ public class RunServer {
                         		String pass2 = in.readLine();
                         		if(pass2.equals(pass)){
                         			board.append("Passwords match");
-                        			int rValue = createAccount(name, lineIn);
+                        			int rValue = createAccount(name, pass);
                         			board.append(rValue+"\n");
                             			//out.println("ACCOUNTCREATED");
                   
@@ -272,14 +272,29 @@ public class RunServer {
         {
         	File file = null;
         	try{
-        		file = new File(("./Files/"+name+".ini"));
+        		file = new File(("./bin/Files/"+name+".ini"));        		
         		file.getParentFile().mkdirs(); 
         		file.createNewFile();
         		Scanner scanner = new Scanner(getClass().getResourceAsStream("/Files/"+name+".ini"));
 	        	FileWriter fw = new FileWriter(file.getAbsoluteFile());
 	            BufferedWriter bw = new BufferedWriter(fw);
 	            // write in file
-	            bw.write("[account]\npassword = "+pass+"\n\n[location]\nx = 3\ny = 3\n\n[inventory]\nslot1 = log");
+	            
+	            bw.write("[account]");
+	            bw.newLine();
+	            bw.write("password = "+pass);
+	            bw.newLine();
+	            bw.newLine();
+	            bw.write("[location]");
+	            bw.newLine();
+	            bw.write("x = 3");
+	            bw.newLine();
+	            bw.write("y = 3");
+	            bw.newLine();
+	            bw.newLine();
+	            bw.write("[inventory]");
+	            bw.newLine();
+	            bw.write("\nslot1 = log");
 	            // close connection
 	            bw.close();
 	        }
