@@ -357,7 +357,9 @@ public class RunServer {
         		if(line.contains("["))
         		{
         			board.append("in contains [\n");
-        			line.substring(1, line.length()-1);
+        			//line.substring(1, line.length()-1);
+        			line = line.replace("[", "");
+        			line = line.replace("]", "");
         			title = line;
         			
         		}
@@ -370,7 +372,21 @@ public class RunServer {
         		}
         	}
         	
-        	board.append("exiting create Associative\n");
+        	board.append("exiting create Associative\nArray contains:\n");
+        	
+        	for(String entry : fullMap.keySet()){
+        		entry.length();
+        		board.append(entry+"\n");
+        		for(String value : fullMap.get(entry).keySet())
+        		{
+        			board.append(value+" = "+fullMap.get(entry).get(value)+"\n");
+        		}
+        		
+        	}
+        	
+        	board.append("pw should be :"+fullMap.get("account").get("password")+"\n");
+        	
+        	
         	
         	return fullMap;
         }
