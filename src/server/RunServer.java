@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -94,6 +96,8 @@ public class RunServer {
         private Socket socket;
         private BufferedReader in;
         private PrintWriter out;
+        private ObjectOutputStream objOut;
+        private ObjectInputStream objIn;
         JTextArea textBox;
         JTextArea console;
         JTextArea board; 
@@ -130,15 +134,20 @@ public class RunServer {
                 in = new BufferedReader(new InputStreamReader(
                     socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
+                
+                
+                objOut = new ObjectOutputStream(socket.getOutputStream());
+                objOut.flush();
+                objIn = new ObjectInputStream(socket.getInputStream());
 
                 // Request a name from this client.  Keep requesting until
                 // a name is submitted that is not already used.  Note that
                 // checking for the existence of a name and adding the name
                 // must be done while locking the set of names.
-                while (true) {
-                	runLogin(in, out);
-                	break;
-                }
+                
+                runLogin(objIn, objOut);
+                
+                
 
                 // Now that a successful name has been chosen, add the
                 // socket's print writer to the set of all writers so
@@ -165,7 +174,10 @@ public class RunServer {
                 }
             } catch (IOException e) {
                 System.out.println(e);
-            } finally {
+            } catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} finally {
                 // This client is going down!  Remove its name and its print
                 // writer from the sets, and close its socket.
             	board.append("Client disconnected\n");
@@ -182,11 +194,14 @@ public class RunServer {
             }
         }
         
-        public void runLogin(BufferedReader in, PrintWriter out) throws IOException
+        public void runLogin(ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException
         {
-        	out.println("SUBMITNAME");
+        	
+        	out.writeObject("SUBMITNAME");
+        	out.flush();
+        	//out.println("SUBMITNAME");
             board.append("Asking for login information\n");
-            name = in.readLine();
+            name = (String) in.readObject();
             if (name == null) {
             	runLogin(in, out);
             }
@@ -196,20 +211,23 @@ public class RunServer {
                 	for(int i = 0; i < 3; i ++)
                 	{
 	                    board.append("User exists: "+name+"\n");
-	                    out.println("SUBMITPASS");
+	                    out.writeObject("SUBMITPASS");
+	                    out.flush();
 	                    board.append("requesting password\n");
-	                    password = in.readLine();
+	                    password = (String) in.readObject();
 	                    if(password == null)
 	                    	break;
 	                    board.append("password entered: "+password+"\n");
 	                    if(checkPassword(name, password, board)){
 	                    	board.append("password accepted");
-	                    	out.println("ACCOUNTACCEPTED");
+	                    	out.writeObject("ACCOUNTACCEPTED");
+	                    	out.flush();
 	                    	return;
 	                    }
 	                    else{
 	                    	board.append("password mismatch");
-	                    	out.println("MESSAGE password mismatch.");
+	                    	out.writeObject("MESSAGE password mismatch.");
+	                    	out.flush();
 	                    }
 	                    
 	                }
@@ -218,17 +236,20 @@ public class RunServer {
                 }
                 else{
                 	board.append("User does not exist, asking if it should be created.\n");
-                	out.println("INVALIDNAME");
-                	lineIn = in.readLine();
+                	out.writeObject("INVALIDNAME");
+                	out.flush();
+                	lineIn = (String) in.readObject();
                 	console.append(lineIn);
                 	if(lineIn.toUpperCase().equals("YES") || lineIn.toUpperCase().equals("Y"))
                 	{
                 		pwMatch = false;
                 		for(int i = 0; i < 3; i++){
-	                		out.println("SUBMITNEWPASS");
-	                		String pass = in.readLine();
-	                		out.println("VERIFYPASS");
-	                		String pass2 = in.readLine();
+	                		out.writeObject("SUBMITNEWPASS");
+	                		out.flush();
+	                		String pass = (String) in.readObject();
+	                		out.writeObject("VERIFYPASS");
+	                		out.flush();
+	                		String pass2 = (String) in.readObject();
 	                		if(pass2.equals(pass)){
 	                			int rValue = createAccount(name, pass);
 	                			board.append(rValue+"\n");
